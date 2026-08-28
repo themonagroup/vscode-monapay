@@ -1,0 +1,115 @@
+{
+  "name": "monapay-vscode",
+  "displayName": "MONA Pay",
+  "description": "Tao VietQR, xem giao dich va nghe webhook MONA Pay ngay trong VS Code.",
+  "version": "0.1.0",
+  "publisher": "monapay",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:monapay.login",
+    "onCommand:monapay.createQr",
+    "onCommand:monapay.showTransactions",
+    "onCommand:monapay.listenWebhook",
+    "onView:monapay.recentTransactions"
+  ],
+  "main": "./dist/extension.js",
+  "files": [
+    "dist",
+    "snippets",
+    "media",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "monapay.login",
+        "title": "MONA Pay: Đăng nhập"
+      },
+      {
+        "command": "monapay.createQr",
+        "title": "MONA Pay: Tạo QR"
+      },
+      {
+        "command": "monapay.showTransactions",
+        "title": "MONA Pay: Xem giao dịch"
+      },
+      {
+        "command": "monapay.listenWebhook",
+        "title": "MONA Pay: Nghe webhook local"
+      }
+    ],
+    "configuration": {
+      "title": "MONA Pay",
+      "properties": {
+        "monapay.baseUrl": {
+          "type": "string",
+          "default": "https://api.monapay.vn",
+          "description": "Base URL API MONA Pay."
+        },
+        "monapay.webhookPort": {
+          "type": "number",
+          "default": 3939,
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Port cho lenh monapay webhook listen."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "monapay",
+          "title": "MONA Pay",
+          "icon": "media/icon-placeholder.svg"
+        }
+      ]
+    },
+    "views": {
+      "monapay": [
+        {
+          "id": "monapay.recentTransactions",
+          "name": "Giao dịch gần nhất"
+        }
+      ]
+    },
+    "snippets": [
+      {
+        "language": "php",
+        "path": "./snippets/monapay-webhook-php.json"
+      },
+      {
+        "language": "javascript",
+        "path": "./snippets/monapay-webhook-node.json"
+      },
+      {
+        "language": "typescript",
+        "path": "./snippets/monapay-webhook-node.json"
+      },
+      {
+        "language": "python",
+        "path": "./snippets/monapay-webhook-python.json"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "check": "tsc -p ./ --noEmit",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "@monapay/node": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.6.0"
+  }
+}

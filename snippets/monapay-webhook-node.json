@@ -1,0 +1,25 @@
+{
+  "MONA Pay webhook Node": {
+    "prefix": "monapay-webhook-node",
+    "description": "Endpoint Node/Express xác thực webhook MONA Pay bằng raw body.",
+    "body": [
+      "const { createHmac, timingSafeEqual } = require('node:crypto');",
+      "",
+      "app.post('${1:/webhooks/monapay}', express.raw({ type: 'application/json' }), (request, response) => {",
+      "  const timestamp = String(request.get('X-Mona-Timestamp') || '');",
+      "  const signature = String(request.get('X-Mona-Signature') || '');",
+      "  if (!/^\\d+$/.test(timestamp) || Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) {",
+      "    return response.status(401).json({ ok: false });",
+      "  }",
+      "  const expected = createHmac('sha256', process.env.MONAPAY_WEBHOOK_SECRET)",
+      "    .update(Buffer.from(`\\${timestamp}.`, 'utf8')).update(request.body).digest();",
+      "  const match = /^sha256=([0-9a-fA-F]{64})$/.exec(signature);",
+      "  const supplied = match ? Buffer.from(match[1], 'hex') : Buffer.alloc(32);",
+      "  if (!match || !timingSafeEqual(expected, supplied)) return response.status(401).json({ ok: false });",
+      "  const payload = JSON.parse(request.body.toString('utf8'));",
+      "  // TODO: INSERT/UPSERT với UNIQUE(payload.transaction_code), rồi đối chiếu amount.",
+      "  return response.status(200).json({ ok: true });",
+      "});"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "MONA Pay webhook Python": {
+    "prefix": "monapay-webhook-python",
+    "description": "Endpoint Python/Flask xác thực webhook MONA Pay bằng raw body.",
+    "body": [
+      "import hashlib",
+      "import hmac",
+      "import json",
+      "import os",
+      "import time",
+      "",
+      "@app.post('${1:/webhooks/monapay}')",
+      "def monapay_webhook():",
+      "    raw_body = request.get_data(cache=False)",
+      "    timestamp = request.headers.get('X-Mona-Timestamp', '')",
+      "    signature = request.headers.get('X-Mona-Signature', '')",
+      "    if not timestamp.isdigit() or abs(int(time.time()) - int(timestamp)) > 300:",
+      "        return {'ok': False}, 401",
+      "    expected = 'sha256=' + hmac.new(",
+      "        os.environ['MONAPAY_WEBHOOK_SECRET'].encode(),",
+      "        timestamp.encode() + b'.' + raw_body,",
+      "        hashlib.sha256,",
+      "    ).hexdigest()",
+      "    if not hmac.compare_digest(expected, signature):",
+      "        return {'ok': False}, 401",
+      "    payload = json.loads(raw_body)",
+      "    # TODO: INSERT/UPSERT với UNIQUE(payload['transaction_code']), rồi đối chiếu amount.",
+      "    return {'ok': True}, 200"
+    ]
+  }
+}

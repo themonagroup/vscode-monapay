@@ -1,0 +1,21 @@
+{
+  "MONA Pay webhook PHP": {
+    "prefix": "monapay-webhook-php",
+    "description": "Endpoint PHP xác thực webhook MONA Pay bằng raw body.",
+    "body": [
+      "<?php",
+      "\\$rawBody = file_get_contents('php://input');",
+      "\\$timestamp = \\$_SERVER['HTTP_X_MONA_TIMESTAMP'] ?? '';",
+      "\\$signature = \\$_SERVER['HTTP_X_MONA_SIGNATURE'] ?? '';",
+      "if (!ctype_digit(\\$timestamp) || abs(time() - (int) \\$timestamp) > 300) {",
+      "    http_response_code(401); exit;",
+      "}",
+      "\\$expected = 'sha256=' . hash_hmac('sha256', \\$timestamp . '.' . \\$rawBody, getenv('MONAPAY_WEBHOOK_SECRET'));",
+      "if (!hash_equals(\\$expected, \\$signature)) { http_response_code(401); exit; }",
+      "\\$payload = json_decode(\\$rawBody, true, 512, JSON_THROW_ON_ERROR);",
+      "// TODO: INSERT/UPSERT với UNIQUE(\\$payload['transaction_code']), rồi đối chiếu amount.",
+      "http_response_code(200);",
+      "echo json_encode(['ok' => true]);"
+    ]
+  }
+}
